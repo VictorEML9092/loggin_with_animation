@@ -11,10 +11,21 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool _isObscure = true; // Estado inicial
 
+  // Cerebro de la lógica de las animaciones
+  StateMachineController?
+  controller; // El ? sirve para verificar que la variable no sea nulo
+  // SMI: State Machine Input
+  SMIBool? isChecking; // Activa la movilidad de los ojos
+  SMIBool? isHandsUp; // Se tapa los ojos
+  SMITrigger? trigSuccess; // Se emociona
+  SMITrigger? trigFail; // Se pone triste
+
   @override
   Widget build(BuildContext context) {
     // Para obtener el tamaño de la pantalla del disp.
+    // MediaQuery = Consulta de las propiedades de la pantalla
     final Size size = MediaQuery.of(context).size;
+
     return Scaffold(
       // Evita nudge o cámaras frontales para móviles
       body: SafeArea(
@@ -28,12 +39,40 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 200,
                 child: RiveAnimation.asset(
                   'assets/animated_login_character.riv',
+                  // Para vincular las animaciones con el estado de la maquina
+                  stateMachines: ["Login Machine"],
+                  // Al iniciarse
+                  onInit: (artboard) {
+                    controller = StateMachineController.fromArtboard(
+                      artboard,
+                      "Login Machine",
+                    );
+                    // Verificar que inició bien
+                    if (controller == null) return;
+                    artboard.addController(
+                      controller!,
+                    ); // El ! es para decirle que no es nulo
+                    isChecking = controller!.findSMI('isChecking');
+                    isHandsUp = controller!.findSMI('isHandsUp');
+                    trigSuccess = controller!.findSMI('trigSuccess');
+                    trigFail = controller!.findSMI('trigFail');
+                  },
                 ),
               ),
               // Espacio entre el oso y el texto Emal
               const SizedBox(height: 10),
               // Campo de texto del Email
               TextField(
+                onChanged: (value) {
+                  if (isHandsUp != null) {
+                    // No subir tapar los ojos al escribir el Email
+                    isHandsUp!.change(false);
+                  }
+                  // Si es nulo no intenta cargar la animación
+                  if (isChecking == null) return;
+                  // Activa el seguimiento de los ojos
+                  isChecking!.change(true);
+                },
                 // Para que aparezca el @ en móviles UI/UX
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
@@ -49,6 +88,16 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 10),
               // Campo de texto de la contraseña
               TextField(
+                onChanged: (value) {
+                  if (isChecking != null) {
+                    // Subir tapar los ojos al escribir el Email
+                    isChecking!.change(false);
+                  }
+                  // Si es nulo no intenta cargar la animación
+                  if (isHandsUp == null) return;
+                  // Activa el seguimiento de los ojos
+                  isHandsUp!.change(true);
+                },
                 // Para ocultar el texto
                 obscureText: _isObscure,
                 // Para que aparezca el @ en móviles UI/UX
@@ -70,6 +119,53 @@ class _LoginScreenState extends State<LoginScreen> {
                     // Esquinas redondeadas
                     borderRadius: BorderRadius.circular(12),
                   ),
+                ),
+              ),
+              const SizedBox(height: 10),
+              // Texto "Olvidé contraseña"
+              SizedBox(
+                width: size.width,
+                child: const Text(
+                  "Forgot your password?",
+                  // Alinear a la derecha
+                  textAlign: TextAlign.right,
+                  style: TextStyle(decoration: TextDecoration.underline),
+                ),
+              ),
+              // Botón de login
+              const SizedBox(height: 10),
+              // Botón estilo Android
+              MaterialButton(
+                minWidth: size.width,
+                height: 50,
+                color: Colors.blue,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadiusGeometry.circular(12),
+                ),
+                onPressed: () {},
+                child: Text("Login", style: TextStyle(color: Colors.white)),
+              ),
+              const SizedBox(height: 10),
+              SizedBox(
+                width: size.width,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("Don't have an account?"),
+                    TextButton(
+                      onPressed: () {},
+                      child: const Text(
+                        "Register",
+                        style: TextStyle(
+                          color: Colors.black,
+                          // En negritas
+                          fontWeight: FontWeight.bold,
+                          // Subrayado
+                          decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
