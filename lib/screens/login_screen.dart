@@ -20,6 +20,24 @@ class _LoginScreenState extends State<LoginScreen> {
   SMITrigger? trigSuccess; // Se emociona
   SMITrigger? trigFail; // Se pone triste
 
+  // 1) FocusNode (Nodo donde esta el foco)
+  final emailFocus = FocusNode();
+  final passFocus = FocusNode();
+
+  // 2) Listeners (Oyentes, escuchadores)
+  @override
+  void initState() {
+    super.initState();
+    emailFocus.addListener(() {
+      if (emailFocus.hasFocus) {
+        isHandsUp?.change(false); // Manos abajo en email
+      }
+    });
+    passFocus.addListener(() {
+      isHandsUp?.change(passFocus.hasFocus); // Manos arriba en password
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // Para obtener el tamaño de la pantalla del disp.
@@ -59,14 +77,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                 ),
               ),
-              // Espacio entre el oso y el texto Emal
+              // Espacio entre el oso y el texto Emial
               const SizedBox(height: 10),
               // Campo de texto del Email
               TextField(
+                focusNode: emailFocus, // Asiganas el focusNode al TextField
                 onChanged: (value) {
                   if (isHandsUp != null) {
                     // No subir tapar los ojos al escribir el Email
-                    isHandsUp!.change(false);
+                    // isHandsUp!.change(false);
                   }
                   // Si es nulo no intenta cargar la animación
                   if (isChecking == null) return;
@@ -88,10 +107,11 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 10),
               // Campo de texto de la contraseña
               TextField(
+                focusNode: passFocus, // Asiganas el focusNode al TextField
                 onChanged: (value) {
                   if (isChecking != null) {
-                    // Subir tapar los ojos al escribir el Email
-                    isChecking!.change(false);
+                    // Tapar los ojos al escribir el Email
+                    // isChecking!.change(false);
                   }
                   // Si es nulo no intenta cargar la animación
                   if (isHandsUp == null) return;
@@ -173,5 +193,13 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+
+  // 4) Liberación de recursos / limpieza de focos
+  @override
+  void dispose() {
+    emailFocus.dispose();
+    passFocus.dispose();
+    super.dispose();
   }
 }
