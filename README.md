@@ -1,13 +1,13 @@
-# ✨ Login con Animación (Rive + Flutter)
+# ✨ Login with Bear Animtion (Rive + Flutter)
 
-## 🧩 Descripción breve de las funcionalidades  
-Esta aplicación muestra una **pantalla de inicio de sesión animada**, donde un personaje reacciona de forma dinámica según las acciones del usuario:  
-- 👀 Baja las manos al escribir la contraseña.  
-- 🤔 Reacciona mientras se escribe el correo.  
-- ✅ Muestra una animación de éxito si las credenciales son correctas.  
-- ❌ Muestra una animación de fallo si las credenciales son incorrectas.  
+## 🧩 Brief Description of the Functionality  
+This application features an animated login screen, where a character dynamically reacts to the user’s actions:  
+- 👀 The character lowers its hands when typing the password  
+- 🤔 The character reacts while the user types the email   
+- ✅ The character plays a success animation when the credentials are valid   
+- ❌ The character plays a sad animation when the credentials are invalid Muestra una animación de fallo si las credenciales son incorrectas.  
 
-El proyecto tiene como objetivo demostrar la integración entre **Rive** y **Flutter** para crear interfaces interactivas con animaciones fluidas.
+The goal of this project is to demonstrate the integration of Rive and Flutter for building interactive interfaces with smooth animations.
 
 ---
 
