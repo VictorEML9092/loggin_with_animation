@@ -11,15 +11,16 @@ The goal of this project is to demonstrate the integration of Rive and Flutter f
 
 ---
 
-## 🎨 ¿Qué es Rive y qué es State Machine?
-**Rive** es una herramienta que permite diseñar y animar gráficos vectoriales en tiempo real. Se integra fácilmente con Flutter, lo que permite controlar animaciones mediante código.  
+## 🎨 What are Rive and State Machine?
+**Rive** is a real-time design and animation tool for vector graphics. It integrates easily with Flutter and allows cotrolling animations with code. 
 
-Una **State Machine** (máquina de estados) en Rive define las **transiciones entre diferentes animaciones**.  
-En este proyecto, la State Machine gestiona los estados del personaje (pensando, escribiendo, feliz o triste) dependiendo de las acciones del usuario.
+A **State Machine** in Rive defines the **transitions between different animations**.  
+
+In this project, the State Machine manages the character's states (such as looking around, covering its eyes, showing success, or showing failure) depending on the user's actions.
 
 ---
 
-## 🛠️ Tecnologías utilizadas
+## 🛠️ Technologies Used
 - **Flutter** 🐦  
 - **Dart** 💻  
 - **Rive** 🎞️  
@@ -27,7 +28,7 @@ En este proyecto, la State Machine gestiona los estados del personaje (pensando,
 
 ---
 
-## 🧱 Estructura básica del proyecto
+## 🧱 Project Structure
 ```bash
 lib/
 │
