@@ -13,6 +13,10 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   bool _isObscure = true; // Estado inicial
 
+  // 5.1) Variable para controlar si el botón Login está cargando
+  // Sirve para mostrar un spinner y evitar que el usuario presione varias veces
+  bool _isLoading = false;
+
   // Cerebro de la lógica de las animaciones
   StateMachineController?
   controller; // El ? sirve para verificar que la variable no sea nulo
@@ -55,18 +59,38 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // 4.4) Acción al botón
-  void _onLogin() {
+  void _onLogin() async {
+    // 5.2) Evitar que se presione el botón mientras está cargando
+    // Si ya se está procesando, no hace nada
+    if (_isLoading) return;
+
+    // 5.3) Activar estado de carga y actualizar UI
+    setState(() {
+      _isLoading = true;
+    });
+
     // trim (recortar) sirve para eliminar espacios en un campo de texto
     final email = emailController.text.trim();
     final pass = passController.text;
 
-    // Recalcular errores
+    // Recalcular errores dinámicamente (solo el primero aplicable)
+    String? eError;
+    if (email.isNotEmpty && !isValidEmail(email)) {
+      eError = 'Email inválido';
+    }
 
-    final eError = isValidEmail(email) ? null : 'Email no valida';
-    final pError = isValidPassword(pass)
-        ? null
-        : 'Mínimo 8 caracteres, 1 mayúscula, 1 minúscula, 1 número y 1 caracter especial';
-
+    String? pError;
+    if (pass.isNotEmpty && pass.length < 8) {
+      pError = 'Debe tener al menos 8 caracteres';
+    } else if (!RegExp(r'[A-Z]').hasMatch(pass)) {
+      pError = 'Debe tener una mayúscula';
+    } else if (!RegExp(r'[a-z]').hasMatch(pass)) {
+      pError = 'Debe tener una minúscula';
+    } else if (!RegExp(r'\d').hasMatch(pass)) {
+      pError = 'Debe incluir un número';
+    } else if (!RegExp(r'[^A-Za-z0-9]').hasMatch(pass)) {
+      pError = 'Debe incluir un carácter especial';
+    }
     // 4.5 Para avisar que hubo un cambio
     setState(() {
       emailError = eError;
@@ -80,11 +104,27 @@ class _LoginScreenState extends State<LoginScreen> {
     isHandsUp?.change(false);
     numLook?.value = 50.0; // Mirada neutral
 
+    // 5.4 Esperar hasta el siguiente frame completo antes de disparar el trigger
+    // Esto garantiza que Rive procese la animación de bajar las manos antes del trigger
+    await Future<void>.delayed(
+      const Duration(milliseconds: 600),
+    ); // Le puse esa cantidad porque es el tiempo necesario para la animación de bajar las manos
+
+    // 5.5 Simular tiempo de carga (~1 segundo)
+    await Future.delayed(const Duration(seconds: 1));
+
     // 4.7 Activar triggers
     if (eError == null && pError == null) {
       trigSuccess?.fire();
     } else {
       trigFail?.fire();
+    }
+
+    // 5.6 Desactivar el estado de carga al finalizar
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -159,9 +199,24 @@ class _LoginScreenState extends State<LoginScreen> {
                   // "Estoy escribiendo"
                   isChecking!.change(true);
 
+                  // 5.8) Validación dinámica de email mientras se escribe
+                  String? eError;
+                  if (value.isNotEmpty && !isValidEmail(value)) {
+                    eError = 'Email inválido';
+                  }
+
+                  // Se borra el error si el campo esta vacío
+                  if (value.isEmpty) {
+                    eError = null;
+                  }
+
+                  setState(() {
+                    emailError = eError;
+                  });
+
                   // Ajuste de límites de 0 a 100
-                  // 80 es una medidad de calibración
-                  final look = (value.length / 100.0 * 100.0).clamp(0.0, 100.0);
+                  // 80 es una medida de calibración
+                  final look = (value.length / 100.0 * 100.0).clamp(0.0, 80.0);
                   numLook?.value = look;
 
                   // 3.3 Debounce: si vuelve a teclear, reinicia el contador
@@ -203,10 +258,28 @@ class _LoginScreenState extends State<LoginScreen> {
                 // 4.8) Enlazar el controller al TextField
                 controller: passController,
                 onChanged: (value) {
-                  if (isChecking != null) {
-                    // Tapar los ojos al escribir el Email
-                    // isChecking!.change(false);
+                  // 5.9) Validación dinámica de password mientras se escribe
+                  String? pError;
+                  if (value.isNotEmpty && value.length < 8) {
+                    pError = 'Debe tener al menos 8 caracteres';
+                  } else if (!RegExp(r'[A-Z]').hasMatch(value)) {
+                    pError = 'Debe tener una mayúscula';
+                  } else if (!RegExp(r'[a-z]').hasMatch(value)) {
+                    pError = 'Debe tener una minúscula';
+                  } else if (!RegExp(r'\d').hasMatch(value)) {
+                    pError = 'Debe incluir un número';
+                  } else if (!RegExp(r'[^A-Za-z0-9]').hasMatch(value)) {
+                    pError = 'Debe incluir un carácter especial';
                   }
+
+                  // Se borra el error si el campo esta vacío
+                  if (value.isEmpty) {
+                    pError = null;
+                  }
+
+                  setState(() {
+                    passError = pError;
+                  });
                   // Si es nulo no intenta cargar la animación
                   if (isHandsUp == null) return;
                   // Activa el seguimiento de los ojos
@@ -258,9 +331,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadiusGeometry.circular(12),
                 ),
-                // 4.10) Llamar a la función de login
-                onPressed: _onLogin,
-                child: Text("Login", style: TextStyle(color: Colors.white)),
+                // 5.7) Deshabilitar el botón mientras carga
+                onPressed: _isLoading ? null : _onLogin,
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.blue)
+                    : const Text(
+                        "Login",
+                        style: TextStyle(color: Colors.white),
+                      ),
               ),
               const SizedBox(height: 10),
               SizedBox(
