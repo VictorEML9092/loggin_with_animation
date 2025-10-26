@@ -44,6 +44,7 @@ pubsec.yaml                  # Dependencies and Flutter configuration
 
 ## 🎥 Demo
 
+![Demo de la aplicación](assets/demo.gif)
 ---
 
 ## 📚 Academic information
