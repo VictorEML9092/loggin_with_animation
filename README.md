@@ -1,4 +1,4 @@
-# ✨ Login with Bear Animtion (Rive + Flutter)
+# ✨ Login with Bear Animation (Rive + Flutter)
 
 ## 🧩 Brief Description of the Functionality  
 This application features an animated login screen, where a character dynamically reacts to the user’s actions:  
